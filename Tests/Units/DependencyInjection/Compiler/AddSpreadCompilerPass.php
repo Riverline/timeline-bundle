@@ -4,20 +4,22 @@ namespace Spy\TimelineBundle\Tests\Units\DependencyInjection\Compiler;
 
 use atoum\atoum;
 use Spy\TimelineBundle\DependencyInjection\Compiler\AddSpreadCompilerPass as TestedModel;
+use Symfony\Component\DependencyInjection\Alias;
 
 class AddSpreadCompilerPass extends atoum\test
 {
     public function testProcess()
     {
         //there are 3 spreaders, with 2 of them under the same priority
-        $taggedServicesResult = array('foo.spread' => array(array('priority' => 10)), 'bar.spread' => array(), 'baz.spread' => array(array('priority' => 10)));
+        $taggedServicesResult = ['foo.spread' => [['priority' => 10]], 'bar.spread' => [], 'baz.spread' => [['priority' => 10]]];
 
         $this
             ->given($containerBuilder = new \mock\Symfony\Component\DependencyInjection\ContainerBuilder())
             ->and($this->mockGenerator->orphanize('__construct'))
             ->and($this->mockGenerator->shuntParentClassCalls())
             ->and($definition = new \mock\Symfony\Component\DependencyInjection\Definition())
-            ->and($this->calling($containerBuilder)->getAlias = function ($alias) {
+            ->and($alias = new Alias('spy_timeline.spread.deployer.default'))
+            ->and($this->calling($containerBuilder)->getAlias = function ($aliasName) use ($alias) {
                 return $alias;
             })
             ->and($this->calling($containerBuilder)->getDefinition = function () use ($definition) {
@@ -37,7 +39,7 @@ class AddSpreadCompilerPass extends atoum\test
                     ->and($this->mock($containerBuilder)->call('getDefinition')->withArguments('baz.spread')->exactly(1))
 
                     //it calls addSpread three times
-                    ->and($this->mock($definition)->call('addMethodCall')->withArguments('addSpread', array($definition))->exactly(3))
+                    ->and($this->mock($definition)->call('addMethodCall')->withArguments('addSpread', [$definition])->exactly(3))
             )
         ;
     }

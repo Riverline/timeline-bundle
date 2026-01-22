@@ -3,36 +3,38 @@
 namespace Spy\TimelineBundle\Twig\TokenParser;
 
 use Spy\TimelineBundle\Twig\Node\TimelineActionThemeNode;
+use Twig\Token;
+use Twig\TokenParser\AbstractTokenParser;
+use Twig\Node\Node;
 
 /**
  * Provides 'timeline_action_theme' tag
  */
-class TimelineActionThemeTokenParser extends \Twig_TokenParser
+class TimelineActionThemeTokenParser extends AbstractTokenParser
 {
     /**
      * Parses a token and returns a node.
      *
-     * @param \Twig_Token $token A Twig_Token instance
+     * @param Token $token A Token instance
      *
-     * @return \Twig_NodeInterface A Twig_NodeInterface instance
+     * @return Node A Node instance
      */
-    public function parse(\Twig_Token $token)
+    public function parse(Token $token): Node
     {
         $stream = $this->parser->getStream();
 
         $action = $this->parser->getExpressionParser()->parseExpression();
 
-        $resources = array();
+        $resources = [];
         do {
             $resources[] = $this->parser->getExpressionParser()->parseExpression();
-        } while (!$stream->test(\Twig_Token::BLOCK_END_TYPE));
+        } while (!$stream->test(Token::BLOCK_END_TYPE));
 
-        $stream->expect(\Twig_Token::BLOCK_END_TYPE);
+        $stream->expect(Token::BLOCK_END_TYPE);
 
         return new TimelineActionThemeNode(
             $action,
-            new \Twig_Node($resources),
-            array(),
+            new Node($resources),
             $token->getLine(),
             $this->getTag()
         );
@@ -43,7 +45,7 @@ class TimelineActionThemeTokenParser extends \Twig_TokenParser
      *
      * @return string The tag name
      */
-    public function getTag()
+    public function getTag(): string
     {
         return 'timeline_action_theme';
     }

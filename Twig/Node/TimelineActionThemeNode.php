@@ -3,30 +3,32 @@
 namespace Spy\TimelineBundle\Twig\Node;
 
 use Spy\TimelineBundle\Twig\Extension\TimelineExtension;
+use Twig\Compiler;
+use Twig\Node\Node;
 
-class TimelineActionThemeNode extends \Twig_Node
+class TimelineActionThemeNode extends Node
 {
-    public function __construct(\Twig_NodeInterface $action, \Twig_NodeInterface $resources, array $attributes = array(), $lineno = 0, $tag = null)
+    public function __construct(Node $action, Node $resources, int $lineno = 0, ?string $tag = null)
     {
-        parent::__construct(array('action' => $action, 'resources' => $resources), $attributes, $lineno, $tag);
+        parent::__construct(['action' => $action, 'resources' => $resources], [], $lineno, $tag);
     }
 
     /**
-     * @param \Twig_Compiler $compiler
+     * @param Compiler $compiler
      */
-    public function compile(\Twig_Compiler $compiler)
+    public function compile(Compiler $compiler): void
     {
         $compiler
             ->addDebugInfo($this)
-            ->write('echo $this->env->getExtension(\''.TimelineExtension::class.'\')->setTheme(')
+            ->write('$this->env->getExtension(\''.TimelineExtension::class.'\')->setTheme(')
             ->subcompile($this->getNode('action'))
-            ->raw(', array(')
+            ->raw(', [')
         ;
 
         foreach ($this->getNode('resources') as $resource) {
             $compiler->subcompile($resource)->raw(', ');
         }
 
-        $compiler->raw("));\n");
+        $compiler->raw("]);\n");
     }
 }

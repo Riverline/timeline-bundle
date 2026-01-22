@@ -22,6 +22,7 @@ class SpyTimelineExtension extends Extension
         $config = $processor->processConfiguration($configuration, $configs);
 
         $loader = new Loader\XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/services'));
+        $loader->load('commands.xml');
         $loader->load('filter.xml');
         $loader->load('notification.xml');
         $loader->load('paginator.xml');
@@ -53,8 +54,8 @@ class SpyTimelineExtension extends Extension
             $actionManager   = isset($config['action_manager'])   ? $config['action_manager'] : sprintf('spy_timeline.action_manager.%s', $driver);
         }
 
-        $container->setAlias('spy_timeline.timeline_manager', $timelineManager);
-        $container->setAlias('spy_timeline.action_manager', $actionManager);
+        $container->setAlias('spy_timeline.timeline_manager', $timelineManager)->setPublic(true);
+        $container->setAlias('spy_timeline.action_manager', $actionManager)->setPublic(true);
 
         // pager
         if (isset($config['paginator']) && !empty($config['paginator'])) {
@@ -97,7 +98,7 @@ class SpyTimelineExtension extends Extension
         }
 
         // spreads
-        $container->setAlias('spy_timeline.spread.deployer', $config['spread']['deployer']);
+        $container->setAlias('spy_timeline.spread.deployer', $config['spread']['deployer'])->setPublic(true);
         $container->setParameter('spy_timeline.spread.deployer.delivery', $config['spread']['delivery']);
         $container->setParameter('spy_timeline.spread.on_subject', $config['spread']['on_subject']);
         $container->setParameter('spy_timeline.spread.on_global_context', $config['spread']['on_global_context']);
@@ -126,7 +127,7 @@ class SpyTimelineExtension extends Extension
 
         // resolve_component
         $resolveComponent = $config['resolve_component'];
-        $container->setAlias('spy_timeline.resolve_component.resolver', $resolveComponent['resolver']);
+        $container->setAlias('spy_timeline.resolve_component.resolver', $resolveComponent['resolver'])->setPublic(true);
 
         // sets a parameter which we use in the addRegistryCompilerPass (there should be a cleaner way)
         if ($resolveComponent['resolver'] === 'spy_timeline.resolve_component.doctrine') {
@@ -148,7 +149,7 @@ class SpyTimelineExtension extends Extension
             }
         }
 
-        $container->setAlias('spy_timeline.driver.object_manager', $config['object_manager']);
+        $container->setAlias('spy_timeline.driver.object_manager', $config['object_manager'])->setPublic(true);
 
         $loader->load('driver/orm.xml');
 
@@ -161,7 +162,7 @@ class SpyTimelineExtension extends Extension
         }
 
         $loader->load('query_builder.xml');
-        $container->setAlias('spy_timeline.query_builder', 'spy_timeline.query_builder.orm');
+        $container->setAlias('spy_timeline.query_builder', 'spy_timeline.query_builder.orm')->setPublic(true);
     }
 
     private function loadODMDriver($container, $loader, $config)
@@ -178,7 +179,7 @@ class SpyTimelineExtension extends Extension
             }
         }
 
-        $container->setAlias('spy_timeline.driver.object_manager', $config['object_manager']);
+        $container->setAlias('spy_timeline.driver.object_manager', $config['object_manager'])->setPublic(true);
 
         $loader->load('driver/odm.xml');
 
@@ -204,7 +205,7 @@ class SpyTimelineExtension extends Extension
         $container->setParameter('spy_timeline.driver.redis.pipeline', $config['pipeline']);
         $container->setParameter('spy_timeline.driver.redis.prefix', $config['prefix']);
 
-        $container->setAlias('spy_timeline.driver.redis.client', $config['client']);
+        $container->setAlias('spy_timeline.driver.redis.client', $config['client'])->setPublic(true);
 
         $loader->load('driver/redis.xml');
     }
