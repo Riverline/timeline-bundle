@@ -17,18 +17,10 @@ class SpreadListCommand extends  atoum\test
     public function testExecute()
     {
         $this->mockGenerator()->orphanize('__construct');
-        $deployer      = new \mock\Spy\Timeline\Spread\Deployer();
-        $deployer->getMockController()->getSpreads = array();
+        $deployer = new \mock\Spy\Timeline\Spread\Deployer();
+        $deployer->getMockController()->getSpreads = [];
 
-        $container = new \mock\Symfony\Component\DependencyInjection\ContainerInterface();
-        $container->getMockController()->get = function ($v) use ($deployer) {
-            if ($v == 'spy_timeline.spread.deployer') {
-                return $deployer;
-            }
-        };
-
-        $command = new TestedCommand();
-        $command->setContainer($container);
+        $command = new TestedCommand($deployer);
 
         $application = new Application();
         $application->add($command);
@@ -36,17 +28,17 @@ class SpreadListCommand extends  atoum\test
         $command = $application->find('spy_timeline:spreads');
 
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array('command' => $command->getName()), array());
+        $commandTester->execute(['command' => $command->getName()], []);
 
         $this->string($commandTester->getDisplay())
             ->isEqualTo('There is 0 timeline spread(s) defined'.PHP_EOL);
 
         // one spread
         $spread = new \mock\Spy\TimelineBundle\Spread\SpreadInterface();
-        $deployer->getMockController()->getSpreads = array($spread);
+        $deployer->getMockController()->getSpreads = [$spread];
 
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array('command' => $command->getName()), array());
+        $commandTester->execute(['command' => $command->getName()], []);
 
         $this->string($commandTester->getDisplay())
             ->isEqualTo('There is 1 timeline spread(s) defined'.PHP_EOL.'- mock\Spy\TimelineBundle\Spread\SpreadInterface'.PHP_EOL);

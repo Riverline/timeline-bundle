@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="spy_timeline.command.spread_list" class="Spy\TimelineBundle\Command\SpreadListCommand">
+            <argument type="service" id="spy_timeline.spread.deployer" />
+            <tag name="console.command" />
+        </service>
+
+        <service id="spy_timeline.command.deploy_action" class="Spy\TimelineBundle\Command\DeployActionCommand">
+            <argument type="service" id="spy_timeline.action_manager" />
+            <argument type="service" id="spy_timeline.spread.deployer" />
+            <argument type="service" id="logger" />
+            <tag name="console.command" />
+        </service>
+    </services>
+</container>

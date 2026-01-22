@@ -18,21 +18,12 @@ class DeployActionCommand extends atoum\test
     {
         $actionManager = new \mock\Spy\Timeline\Driver\ActionManagerInterface();
         $this->mockGenerator()->orphanize('__construct');
-        $deployer      = new \mock\Spy\Timeline\Spread\Deployer();
+        $deployer = new \mock\Spy\Timeline\Spread\Deployer();
+        $logger = new \mock\Psr\Log\LoggerInterface();
 
-        $actionManager->getMockController()->findActionsWithStatusWantedPublished = array();
+        $actionManager->getMockController()->findActionsWithStatusWantedPublished = [];
 
-        $container = new \mock\Symfony\Component\DependencyInjection\ContainerInterface();
-        $container->getMockController()->get = function ($v) use ($actionManager, $deployer) {
-            if ($v == 'spy_timeline.action_manager') {
-                return $actionManager;
-            } elseif ($v == 'spy_timeline.spread.deployer') {
-                return $deployer;
-            }
-        };
-
-        $command = new TestedCommand();
-        $command->setContainer($container);
+        $command = new TestedCommand($actionManager, $deployer, $logger);
 
         $application = new Application();
         $application->add($command);
@@ -40,7 +31,7 @@ class DeployActionCommand extends atoum\test
         $command = $application->find('spy_timeline:deploy');
 
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array('command' => $command->getName()), array());
+        $commandTester->execute(['command' => $command->getName()], []);
 
         $this->mock($actionManager)
             ->call('findActionsWithStatusWantedPublished')
@@ -54,23 +45,14 @@ class DeployActionCommand extends atoum\test
     {
         $actionManager = new \mock\Spy\Timeline\Driver\ActionManagerInterface();
         $this->mockGenerator()->orphanize('__construct');
-        $deployer      = new \mock\Spy\Timeline\Spread\Deployer();
-        $action        = new \mock\Spy\Timeline\Model\ActionInterface();
+        $deployer = new \mock\Spy\Timeline\Spread\Deployer();
+        $logger = new \mock\Psr\Log\LoggerInterface();
+        $action = new \mock\Spy\Timeline\Model\ActionInterface();
 
         $action->getMockController()->getId = 1;
-        $actionManager->getMockController()->findActionsWithStatusWantedPublished = array($action);
+        $actionManager->getMockController()->findActionsWithStatusWantedPublished = [$action];
 
-        $container = new \mock\Symfony\Component\DependencyInjection\ContainerInterface();
-        $container->getMockController()->get = function ($v) use ($actionManager, $deployer) {
-            if ($v == 'spy_timeline.action_manager') {
-                return $actionManager;
-            } elseif ($v == 'spy_timeline.spread.deployer') {
-                return $deployer;
-            }
-        };
-
-        $command = new TestedCommand();
-        $command->setContainer($container);
+        $command = new TestedCommand($actionManager, $deployer, $logger);
 
         $application = new Application();
         $application->add($command);
@@ -78,7 +60,7 @@ class DeployActionCommand extends atoum\test
         $command = $application->find('spy_timeline:deploy');
 
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array('command' => $command->getName()), array());
+        $commandTester->execute(['command' => $command->getName()], []);
 
         $this->mock($actionManager)
             ->call('findActionsWithStatusWantedPublished')
